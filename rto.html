@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CARBON EMISSION DETECTION SYSTEM</title>
+</head>
+<body>
+    <center>
+        <h1>CARBON EMISSION DETECTION SYSTEM</h1>
+
+        <!-- Table to display data -->
+        <table border="1" style="width: 80%; margin-top: 20px;">
+            <tr>
+                <th style="padding: 10px;">COUNT</th>
+                <th style="padding: 10px;">GAS</th>
+                <th style="padding: 10px;">NUMBER PLATE</th>
+            </tr>
+            <tr id="dataRow1">
+                <td id="field1Data1" style="padding: 10px;"></td>
+                <td id="field2Data1" style="padding: 10px;"></td>
+                <td id="field3Data1" style="padding: 10px;"></td>
+            </tr>
+            <tr id="dataRow2">
+                <td id="field1Data2" style="padding: 10px;"></td>
+                <td id="field2Data2" style="padding: 10px;"></td>
+                <td id="field3Data2" style="padding: 10px;"></td>
+            </tr>
+            <tr id="dataRow3">
+                <td id="field1Data3" style="padding: 10px;"></td>
+                <td id="field2Data3" style="padding: 10px;"></td>
+                <td id="field3Data3" style="padding: 10px;"></td>
+            </tr>
+        </table>
+
+        <!-- Buttons for ON and OFF -->
+        <button onclick="sendRequest('on')">ON</button>
+        <button onclick="sendRequest('off')">OFF</button>
+
+        <script>
+            // Function to send requests...
+             // Function to send requests
+             function sendRequest(action) {
+                var url;
+                if (action === 'on') {
+                    url = 'https://api.thingspeak.com/update?api_key=1Y5AWUR4KI7Y1FMW&field1=2';
+                } else if (action === 'off') {
+                    url = 'https://api.thingspeak.com/update?api_key=1Y5AWUR4KI7Y1FMW&field1=3';
+                }
+
+                // Make an HTTP request
+                fetch(url, { method: 'GET' })
+                    .then(response => {
+                        // Handle the response as needed
+                        console.log('Request sent successfully');
+                    })
+                    .catch(error => {
+                        console.error('Error sending request:', error);
+                    });
+            }
+
+            // Function to update table data
+            function updateTableData() {
+                // Fetch data from ThingSpeak public channel 558170
+                fetch('https://api.thingspeak.com/channels/558170/feeds.json?results=3')
+                    .then(response => response.json())
+                    .then(data => {
+                        // Update table with the latest data
+                        updateTableRow(data.feeds[0], 'dataRow1');
+                        updateTableRow(data.feeds[1], 'dataRow2');
+                        updateTableRow(data.feeds[2], 'dataRow3');
+                    })
+                    .catch(error => {
+                        console.error('Error fetching data:', error);
+                    });
+            }
+
+            // Function to update a table row with data
+            function updateTableRow(feed, rowId) {
+                document.getElementById('field1Data' + rowId.charAt(rowId.length - 1)).innerText = feed.field1;
+                document.getElementById('field2Data' + rowId.charAt(rowId.length - 1)).innerText = feed.field2;
+                document.getElementById('field3Data' + rowId.charAt(rowId.length - 1)).innerText = feed.field3;
+            }
+
+            // Initial data update
+            updateTableData();
+
+            // Periodically update data (you can adjust the interval as needed)
+            setInterval(updateTableData, 5000); // Update every 5 seconds
+        </script>
+        </script>
+    </center>
+</body>
+</html>
